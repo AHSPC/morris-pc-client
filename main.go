@@ -37,15 +37,14 @@ func makeRequest(path string, data Data) (Data, error) {
 	}
 
 	var response Data
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&response); err != nil {
-		body, _ := io.ReadAll(resp.Body)
-
-		fmt.Println("3", body)
-
+	body, _ := io.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		fmt.Println(path, "(body is not Data) 3", string(body))
 		return Data{"text": string(body)}, nil
 	}
 
+	fmt.Println(5, response)
 	return response, nil
 }
 
@@ -66,15 +65,9 @@ func checkTasks() {
 		fmt.Println("1 - Error getting actions.")
 		return
 	}
-	fmt.Println(resp)
-	actions, ok := resp["actions"].(map[string]string)
-	if !ok {
-		fmt.Println("2 - Error getting actions.")
-		return
-	}
 
-	for id, action := range actions {
-		_, err := execCmd(action)
+	for id, action := range resp {
+		_, err := execCmd(action.(string))
 		if err != nil {
 			makeRequest("/mark-failed", Data{"task_id": id, "info": err.Error()})
 			continue
@@ -82,7 +75,6 @@ func checkTasks() {
 
 		makeRequest("/mark-completed", Data{"task_id": id})
 	}
-	fmt.Println("run")
 }
 
 func main() {
