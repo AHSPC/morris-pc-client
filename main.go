@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os/exec"
-	// "time"
+	"time"
 )
 
 const (
@@ -78,17 +78,17 @@ func checkTasks() {
 }
 
 func main() {
-	// _, err := makeRequest("/exists", Data{})
-	// if err != nil {
-	// 	fmt.Println("Error, /exists request failed.")
-	// }
+	_, err := makeRequest("/exists", Data{})
+	if err != nil {
+		fmt.Println("Error, /exists request failed.")
+	}
 
-	// config, _ := makeRequest("/get-config", Data{})
-	// fmt.Println(config)
+	config, _ := makeRequest("/get-config", Data{})
+	fmt.Println(config)
 
 	checkTasks()
 
-	// for range time.Tick(time.Second * 20) {
-	// 	checkTasks()
-	// }
+	for range time.Tick(20 * time.Second) {
+		checkTasks()
+	}
 }
